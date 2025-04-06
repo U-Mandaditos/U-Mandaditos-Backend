@@ -1,7 +1,4 @@
-﻿using Aplication.DTOs.Locations;
-using Aplication.DTOs.Media;
-
-namespace Aplication.DTOs.Users.PublicProfile
+﻿namespace Aplication.DTOs.Users.Profile
 {
     public class UserPublicProfileInfoResponseDTO
     {

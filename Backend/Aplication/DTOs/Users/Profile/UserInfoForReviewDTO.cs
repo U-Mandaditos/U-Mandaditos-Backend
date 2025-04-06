@@ -1,4 +1,4 @@
-﻿namespace Aplication.DTOs.Users.PublicProfile
+﻿namespace Aplication.DTOs.Users.Profile
 {
     public class UserInfoForReviewDTO
     {
