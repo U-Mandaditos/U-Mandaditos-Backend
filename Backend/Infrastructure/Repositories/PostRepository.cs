@@ -51,6 +51,15 @@ public class PostRepository: IPostRepository
         _context.Posts.Update(post);
         return await _context.SaveChangesAsync() > 0;
     }
+
+    public async Task<bool> MarkAsAcceptedAsync(int idPost)
+    {
+        var post = await _context.Posts.FindAsync(idPost);
+        if (post is null) return false;
+        post.Accepted = true;
+        _context.Posts.Update(post);
+        return await _context.SaveChangesAsync() > 0;
+    }
     
     public async Task<IEnumerable<Post>> GetPostsByLocationIdAsync(int idLocation)
     {

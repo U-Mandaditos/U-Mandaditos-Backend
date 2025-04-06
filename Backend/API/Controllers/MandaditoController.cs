@@ -35,18 +35,9 @@ public class MandaditoController : ControllerBase
     public async Task<IActionResult> Create([FromBody] MandaditoRequestDTO dto)
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
-        try
-        {
-            var mandadito = await _mandaditoService.CreateAsync(dto);
-        
-            if (mandadito is null) return BadRequest("No se pudo crear el mandadito correctamente");
 
-            return CreatedAtAction(nameof(GetMandaditoById), new { id = mandadito.Id }, mandadito);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
-        }
+        var response = await _mandaditoService.CreateAsync(dto);
+        return Ok(response);
     }
     
     [HttpGet("history")]

@@ -18,12 +18,9 @@ namespace Infrastructure.Repositories
         {
             return await _context.Offers
                 .Include(o => o.UserCreator)
-                    .ThenInclude(u => new { u!.Name, u.LastLocation, u.Rating })
                 .Include(o => o.UserCreator)
                     .ThenInclude(u => u!.ProfilePic)
-                        .ThenInclude(pp => new { pp!.Link })
                 .Include(o => o.Post)
-                    .ThenInclude(p => new { p!.SugestedValue })
                 .Where(o => o.IdPost == idPost)
                 .ToListAsync();
         }
@@ -75,9 +72,7 @@ namespace Infrastructure.Repositories
         {
             return await _context.Offers
                     .Include(o => o.Post)
-                        .ThenInclude(p => new { p!.PickUpLocation, p.DeliveryLocation, p.Description })
                     .Include(o => o.UserCreator)
-                        .ThenInclude(u => new { u!.Name })
                     .Where(o => o.IdUserCreator == userId && o.Accepted)
                     .OrderByDescending(o => o.CreatedAt)
                     .ToListAsync();

@@ -21,5 +21,7 @@ public class Post: AggregateRoot
     public  DateTime CreatedAt { get; set; }
     
     public bool Completed { get; set; }
+
+    public bool Accepted { get; set; } 
     
 }

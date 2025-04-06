@@ -28,10 +28,10 @@ public class MandaditoService : IMandaditoService
     public async Task<ResponseDTO<MandaditoResponseDTO?>> GetByIdAsync(int id)
     {
         Console.WriteLine("id man: " + id);
-        
+
         var mandadito = await _mandaditoRepository.GetByIdAsync(id);
         Console.WriteLine(mandadito);
-        
+
         if (mandadito == null)
         {
             return new ResponseDTO<MandaditoResponseDTO?>()
@@ -41,7 +41,7 @@ public class MandaditoService : IMandaditoService
                 Data = null
             };
         }
-        
+
         var userId = _authenticatedUserService.GetAuthenticatedUserId();
         var isOwner = mandadito.Post?.PosterUser.Id == userId;
         var isRunner = mandadito.Offer?.UserCreator.Id == userId;
@@ -58,21 +58,21 @@ public class MandaditoService : IMandaditoService
                 Data = null
             };
         }
-        
+
         var data = new MandaditoResponseDTO
+        {
+            Id = mandadito.Id,
+            SecurityCode = mandadito.SecurityCode,
+            AcceptedAt = mandadito.AcceptedAt,
+            AcceptedRate = mandadito.AcceptedRate,
+            Ratings = mandadito.Ratings.Select(r => new RatingMandaditosDTO()
             {
-                Id = mandadito.Id,
-                SecurityCode = mandadito.SecurityCode,
-                AcceptedAt = mandadito.AcceptedAt,
-                AcceptedRate = mandadito.AcceptedRate,
-                Ratings = mandadito.Ratings.Select(r => new RatingMandaditosDTO()
-                {
-                    DatePosted = r.CreatedAt.ToString("g"),
-                    Review = r.Review,
-                    IsRunner = r.RatedRole?.Id == 2,
-                    Rating = r.RatingNum
-                }),
-                Offer = mandadito.Offer is null
+                DatePosted = r.CreatedAt.ToString("g"),
+                Review = r.Review,
+                IsRunner = r.RatedRole?.Id == 2,
+                Rating = r.RatingNum
+            }),
+            Offer = mandadito.Offer is null
                     ? null
                     : new OfferDTO
                     {
@@ -92,7 +92,7 @@ public class MandaditoService : IMandaditoService
                         IsCounterOffer = mandadito.Offer.IsCounterOffer,
                         Accepted = mandadito.Offer.Accepted
                     },
-                Post = mandadito.Post is null
+            Post = mandadito.Post is null
                     ? null
                     : new PostMandaditoDTO
                     {
@@ -110,8 +110,8 @@ public class MandaditoService : IMandaditoService
                         PickupLocation = mandadito.Post.PickUpLocation.Name,
                         DeliveryLocation = mandadito.Post.DeliveryLocation.Name
                     }
-            };
-        
+        };
+
         return new ResponseDTO<MandaditoResponseDTO?>()
         {
             Success = true,
@@ -137,7 +137,7 @@ public class MandaditoService : IMandaditoService
         });
     }
 
-    public async Task<MandaditoResponseMinDTO?> CreateAsync(MandaditoRequestDTO dto)
+    public async Task<ResponseDTO<MandaditoResponseMinDTO?>> CreateAsync(MandaditoRequestDTO dto)
     {
         string securityCode = _codeGeneratorService.GenerateMandaditoCode(6);
         var mandadito = new Mandadito(
@@ -147,25 +147,57 @@ public class MandaditoService : IMandaditoService
             idOffer: dto.OfferId,
             acceptedAt: DateTime.Now);
 
-        await _mandaditoRepository.AddAsync(mandadito);
-
-        return new MandaditoResponseMinDTO
+        try
         {
-            Id = mandadito.Id,
-            SecurityCode = mandadito.SecurityCode,
-            AcceptedAt = mandadito.AcceptedAt,
-            AcceptedRate = mandadito.AcceptedRate,
-            OfferId = mandadito.IdOffer,
-            PostId = mandadito.IdPost
-        };
+            // Intentar agregar el mandadito
+            await _mandaditoRepository.AddAsync(mandadito);
+
+            // Verificar si la creación fue exitosa al intentar obtenerlo por su Id
+            var createdMandadito = await _mandaditoRepository.GetByIdAsync(mandadito.Id);
+            if (createdMandadito == null)
+            {
+                return new ResponseDTO<MandaditoResponseMinDTO?>
+                {
+                    Success = false,
+                    Message = "Hubo un problema al crear el mandadito, no se encontró el registro después de la creación.",
+                    Data = null
+                };
+            }
+
+            // Si fue exitoso, retornamos los datos
+            return new ResponseDTO<MandaditoResponseMinDTO?>
+            {
+                Success = true,
+                Message = "Mandadito created successfully",
+                Data = new MandaditoResponseMinDTO
+                {
+                    Id = mandadito.Id,
+                    SecurityCode = mandadito.SecurityCode,
+                    AcceptedAt = mandadito.AcceptedAt,
+                    AcceptedRate = mandadito.AcceptedRate,
+                    OfferId = mandadito.IdOffer,
+                    PostId = mandadito.IdPost
+                }
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseDTO<MandaditoResponseMinDTO?>
+            {
+                Success = false,
+                Message = $"Error creating Mandadito: {ex.Message}",
+                Data = null
+            };
+        }
     }
+
 
     public async Task<Dictionary<string, List<Mandadito>>> Execute()
     {
         var userId = _authenticatedUserService.GetAuthenticatedUserId();
         return await _mandaditoRepository.GetHistoryMandaditos(userId);
     }
-    
+
     public async Task<Dictionary<string, List<Mandadito>>> ExecuteGet()
     {
         var userId = _authenticatedUserService.GetAuthenticatedUserId();

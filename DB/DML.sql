@@ -106,7 +106,7 @@ VALUES ('Poster', 1),
        ('Runner', 1);
 
 INSERT INTO [Users] (Name, DNI, Email, Password, BirthDay, Rating, ProfilePicId, LastLocationId, CareerId)
-VALUES ('Juan Perez', '12345678', 'juan.perez@example.com', 'IoWHf77EuxrWRmptNZbzo2lkbbA6AtT3SiYWpQ1Fegw=', '1990-05-15', 4, 1, 1, 5),
+VALUES ('Juan Perez', '12345678', 'juan.perez@example.com', 'qEYJUU31cXLIQMPkUcYPmNoaiAztAax7Z1U3zLoAu5Y=', '1990-05-15', 4, 1, 1, 5),
        ('Maria Gomez', '87654321', 'maria.gomez@example.com', 'IoWHf77EuxrWRmptNZbzo2lkbbA6AtT3SiYWpQ1Fegw=', '1985-08-22', 5, 2, 2, 10),
        ('Carlos Ruiz', '23456789', 'carlos.ruiz@example.com', 'IoWHf77EuxrWRmptNZbzo2lkbbA6AtT3SiYWpQ1Fegw=', '1992-11-30', 3, 3, 3, 15),
        ('Ana Lopez', '34567890', 'ana.lopez@example.com', 'IoWHf77EuxrWRmptNZbzo2lkbbA6AtT3SiYWpQ1Fegw=', '1988-03-10', 4, 4, 4, 20),
@@ -117,28 +117,28 @@ VALUES ('Juan Perez', '12345678', 'juan.perez@example.com', 'IoWHf77EuxrWRmptNZb
        ('Miguel Castro', '89012345', 'miguel.castro@example.com', 'IoWHf77EuxrWRmptNZbzo2lkbbA6AtT3SiYWpQ1Fegw=', '1989-06-20', 5, 9, 9, 12),
        ('Elena Morales', '90123456', 'elena.morales@example.com', 'IoWHf77EuxrWRmptNZbzo2lkbbA6AtT3SiYWpQ1Fegw=', '1994-02-14', 2, 10, 10, 18);
 
-INSERT INTO [Posts] (Title, Description, SugestedValue, IdPosterUser, IdPickupLocation, IdDeliveryLocation, CreatedAt, Completed)
+INSERT INTO [Posts] (Title, Description, SugestedValue, IdPosterUser, IdPickupLocation, IdDeliveryLocation, CreatedAt, Completed, Accepted)
 VALUES 
-('Pizza Margarita', '¡Hola! ¿Alguien podría traerme una Pizza Margarita desde Pizzería Napoli? Estoy en la zona universitaria y pagaría $15.50', 15.50, 1, 2, 5, '2023-01-10 09:00:00', 1),
-('Sushi Variado', 'Busco quien me traiga un combo de Sushi Variado desde Sushi Palace hasta mi oficina en el centro. Ofrezco $30 por el favor', 30.00, 2, 3, 7, '2023-02-15 10:30:00', 0),
-('Hamburguesa Doble', '¡Tengo antojo de una Hamburguesa Doble con queso! ¿Alguien viene de Burger Town hacia el parque? Pagaría $12', 12.00, 3, 4, 8, '2023-03-20 08:45:00', 1),
-('Ensalada César', 'Necesito una Ensalada César saludable para el almuerzo. Si alguien pasa por Fresh Greens, ofrezco $10', 10.00, 4, 5, 9, '2023-04-25 11:15:00', 0),
-('Tacos de Carnitas', '¡Tacos urgentes! ¿Alguien puede traerme Tacos de Carnitas desde Taquería El Michoacano? Estoy en la colonia Reforma', 18.00, 5, 6, 10, '2023-05-30 12:00:00', 1),
-('Pasta Alfredo', 'Busco quien me traiga Pasta Alfredo desde Italianissimo para cenar. Ofrezco $22 por el servicio', 22.00, 6, 7, 11, '2023-06-05 07:30:00', 0),
-('Helado de Vainilla', '¿Alguien viene de la heladería y me puede traer un Helado de Vainilla? Estoy en casa con antojo dulce :)', 8.00, 7, 8, 12, '2023-07-10 14:20:00', 1),
-('Café Americano', 'Necesito un Café Americano grande desde Coffee Time para seguir trabajando. ¡Ayuda por favor!', 5.00, 8, 9, 13, '2023-08-15 16:45:00', 0),
-('Tarta de Manzana', '¿Alguien que venga de la pastelería podría traerme una porción de Tarta de Manzana? Es para un cumpleaños sorpresa', 12.00, 9, 10, 14, '2023-09-20 13:10:00', 1),
-('Burrito de Pollo', '¡Tengo mucha hambre! ¿Alguien puede traerme un Burrito de Pollo desde Chipotle? Estoy en el edificio de oficinas 3', 14.00, 10, 11, 15, '2023-10-25 09:55:00', 0),
-('Lasagna de Carne', 'Busco quien me traiga Lasagna de Carne desde Trattoria Bella para la cena familiar de hoy', 20.00, 1, 12, 16, '2023-11-30 10:40:00', 1),
-('Sopa de Tomate', 'No me siento bien, ¿alguien podría traerme una Sopa de Tomate calentita desde Soup Factory?', 9.00, 2, 13, 17, '2023-12-05 08:25:00', 0),
-('Milanesa con Papas', '¡Antojo de comida casera! ¿Quién me puede traer Milanesa con Papas desde El Rincón Familiar?', 18.00, 3, 14, 18, '2024-01-10 11:50:00', 1),
-('Empanadas de Jamón y Queso', 'Necesito 6 Empanadas de Jamón y Queso para una reunión rápida. ¿Alguien puede ayudar?', 15.00, 4, 15, 1, '2024-02-15 12:35:00', 0),
-('Churros con Chocolate', 'Buscando Churros con Chocolate recién hechos para compartir con mi novia. ¡Gracias!', 10.00, 5, 16, 2, '2024-03-20 09:20:00', 1),
-('Ceviche de Pescado', '¿Alguien viene de la costa y puede traerme Ceviche de Pescado fresco? Es para una ocasión especial', 25.00, 6, 17, 3, '2024-04-25 15:05:00', 0),
-('Ramen de Cerdo', 'Día frío, necesito un Ramen de Cerdo auténtico. ¿Alguien pasa por Ramen Ya hoy?', 28.00, 7, 18, 4, '2024-05-30 10:10:00', 1),
-('Brownie con Helado', 'Antojo dulce: ¿quién me puede traer Brownie con Helado desde The Cheesecake Shop?', 12.00, 8, 1, 5, '2024-06-05 07:55:00', 0),
-('Sandwich de Pavo', 'Busco un Sandwich de Pavo saludable para el almuerzo de hoy. ¡Gracias!', 11.00, 9, 2, 6, '2024-07-10 13:40:00', 1),
-('Batido de Fresa', '¿Alguien puede traerme un Batido de Fresa grande desde Juice Bar? Estoy en el gimnasio', 7.00, 10, 3, 7, '2024-08-15 16:15:00', 0);
+('Pizza Margarita', '¡Hola! ¿Alguien podría traerme una Pizza Margarita desde Pizzería Napoli? Estoy en la zona universitaria y pagaría $15.50', 15.50, 1, 2, 5, '2023-01-10 09:00:00', 0, 0),
+('Sushi Variado', 'Busco quien me traiga un combo de Sushi Variado desde Sushi Palace hasta mi oficina en el centro. Ofrezco $30 por el favor', 30.00, 2, 3, 7, '2023-02-15 10:30:00', 0, 0),
+('Hamburguesa Doble', '¡Tengo antojo de una Hamburguesa Doble con queso! ¿Alguien viene de Burger Town hacia el parque? Pagaría $12', 12.00, 3, 4, 8, '2023-03-20 08:45:00', 1, 0),
+('Ensalada César', 'Necesito una Ensalada César saludable para el almuerzo. Si alguien pasa por Fresh Greens, ofrezco $10', 10.00, 4, 5, 9, '2023-04-25 11:15:00', 0, 0),
+('Tacos de Carnitas', '¡Tacos urgentes! ¿Alguien puede traerme Tacos de Carnitas desde Taquería El Michoacano? Estoy en la colonia Reforma', 18.00, 5, 6, 10, '2023-05-30 12:00:00', 1, 0),
+('Pasta Alfredo', 'Busco quien me traiga Pasta Alfredo desde Italianissimo para cenar. Ofrezco $22 por el servicio', 22.00, 6, 7, 11, '2023-06-05 07:30:00', 0, 0),
+('Helado de Vainilla', '¿Alguien viene de la heladería y me puede traer un Helado de Vainilla? Estoy en casa con antojo dulce :)', 8.00, 7, 8, 12, '2023-07-10 14:20:00', 1, 0),
+('Café Americano', 'Necesito un Café Americano grande desde Coffee Time para seguir trabajando. ¡Ayuda por favor!', 5.00, 8, 9, 13, '2023-08-15 16:45:00', 0, 0),
+('Tarta de Manzana', '¿Alguien que venga de la pastelería podría traerme una porción de Tarta de Manzana? Es para un cumpleaños sorpresa', 12.00, 9, 10, 14, '2023-09-20 13:10:00', 1, 0),
+('Burrito de Pollo', '¡Tengo mucha hambre! ¿Alguien puede traerme un Burrito de Pollo desde Chipotle? Estoy en el edificio de oficinas 3', 14.00, 10, 11, 15, '2023-10-25 09:55:00', 0, 0),
+('Lasagna de Carne', 'Busco quien me traiga Lasagna de Carne desde Trattoria Bella para la cena familiar de hoy', 20.00, 1, 12, 16, '2023-11-30 10:40:00', 1, 0),
+('Sopa de Tomate', 'No me siento bien, ¿alguien podría traerme una Sopa de Tomate calentita desde Soup Factory?', 9.00, 2, 13, 17, '2023-12-05 08:25:00', 0, 0),
+('Milanesa con Papas', '¡Antojo de comida casera! ¿Quién me puede traer Milanesa con Papas desde El Rincón Familiar?', 18.00, 3, 14, 18, '2024-01-10 11:50:00', 1, 0),
+('Empanadas de Jamón y Queso', 'Necesito 6 Empanadas de Jamón y Queso para una reunión rápida. ¿Alguien puede ayudar?', 15.00, 4, 15, 1, '2024-02-15 12:35:00', 0, 0),
+('Churros con Chocolate', 'Buscando Churros con Chocolate recién hechos para compartir con mi novia. ¡Gracias!', 10.00, 5, 16, 2, '2024-03-20 09:20:00', 1, 0),
+('Ceviche de Pescado', '¿Alguien viene de la costa y puede traerme Ceviche de Pescado fresco? Es para una ocasión especial', 25.00, 6, 17, 3, '2024-04-25 15:05:00', 0, 0),
+('Ramen de Cerdo', 'Día frío, necesito un Ramen de Cerdo auténtico. ¿Alguien pasa por Ramen Ya hoy?', 28.00, 7, 18, 4, '2024-05-30 10:10:00', 1, 0),
+('Brownie con Helado', 'Antojo dulce: ¿quién me puede traer Brownie con Helado desde The Cheesecake Shop?', 12.00, 8, 1, 5, '2024-06-05 07:55:00', 0, 0),
+('Sandwich de Pavo', 'Busco un Sandwich de Pavo saludable para el almuerzo de hoy. ¡Gracias!', 11.00, 9, 2, 6, '2024-07-10 13:40:00', 1, 0),
+('Batido de Fresa', '¿Alguien puede traerme un Batido de Fresa grande desde Juice Bar? Estoy en el gimnasio', 7.00, 10, 3, 7, '2024-08-15 16:15:00', 0, 0);
 
 INSERT INTO [Offers] (CounterOfferAmount, IdPost, IdUserCreator, CreatedAt, IsCounterOffer, Accepted)
 VALUES (15.50, 1, 2, '2023-01-12 10:15:30', 0, 1),   -- Igual al SuggestedValue del Post 1
@@ -204,3 +204,6 @@ VALUES (1, 2, 1, 5, '¡Excelente servicio! Todo llegó a tiempo y en perfecto es
         '2023-05-31 13:15:00'), -- IdMandadito 5, IdRatedRole 1 (cliente)
        (5, 5, 6, 4, 'Muy buen servicio, pero el trato podría ser más amable.', 2,
         '2023-05-31 13:20:00'); -- IdMandadito 5, IdRatedRole 2 (repartidor)
+
+INSERT INTO ManagementRole (Name, Active)
+VALUES ('Cambio de contraseña', 1)

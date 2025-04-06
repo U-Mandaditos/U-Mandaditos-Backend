@@ -1,4 +1,4 @@
-﻿using Aplication.DTOs.General;
+using Aplication.DTOs.General;
 using Aplication.DTOs.Posts;
 using Aplication.Interfaces.Auth;
 using Aplication.Interfaces.Locations;
@@ -22,7 +22,7 @@ public class PostService : IPostService
         _locationRepository = locationRepository;
         _authenticatedUserService = authenticatedUserService;
     }
-    
+
     public async Task<ResponseDTO<PostResponseDTO>> CreateAsync(PostRequestDTO dto)
     {
         var userId = _authenticatedUserService.GetAuthenticatedUserId(); //Obtiene el id del usuario autenticado
@@ -36,7 +36,7 @@ public class PostService : IPostService
                 Data = null
             };
         }
-        
+
         var pickUpLocation = await _locationRepository.GetByIdAsync(dto.IdPickUpLocation);
         if (pickUpLocation == null)
         {
@@ -47,7 +47,7 @@ public class PostService : IPostService
                 Data = null
             };
         }
-        
+
         var deliveryLocation = await _locationRepository.GetByIdAsync(dto.IdDeliveryLocation);
         if (deliveryLocation == null)
         {
@@ -58,7 +58,7 @@ public class PostService : IPostService
                 Data = null
             };
         }
-        
+
         var post = new Post
         {
             Title = dto.Title,
@@ -68,11 +68,12 @@ public class PostService : IPostService
             IdDeliveryLocation = dto.IdDeliveryLocation,
             IdPosterUser = userId,
             CreatedAt = DateTime.Now,
-            Completed = false //Por defecto el post no esta completado
+            Completed = false,
+            Accepted = false,
         };
 
         await _postRepository.AddAsync(post);
-        
+
         return new ResponseDTO<PostResponseDTO>
         {
             Success = true,
@@ -94,8 +95,8 @@ public class PostService : IPostService
     public async Task<ResponseDTO<IEnumerable<PostResponseDTO>>> GetAllNearAsync(int currentLocationId)
     {
         var posts = await _postRepository.GetAllAsync();
-        
-        var nearPosts= posts.Where(post => post.IdPickUpLocation == currentLocationId && post.Completed == false).Select(post => new PostResponseDTO
+
+        var nearPosts = posts.Where(post => post.IdPickUpLocation == currentLocationId && post.Completed == false).Select(post => new PostResponseDTO
         {
             Id = post.Id,
             Title = post.Title,
@@ -105,7 +106,7 @@ public class PostService : IPostService
             PosterUserName = post.PosterUser.Name,
             CreatedAt = post.CreatedAt.ToString("hh:mm tt") //SOlo la hora y minutos
         });
-        
+
         return new ResponseDTO<IEnumerable<PostResponseDTO>>
         {
             Success = true,
@@ -113,7 +114,7 @@ public class PostService : IPostService
             Data = nearPosts
         };
     }
-    
+
     public async Task<IEnumerable<PostResponseDTO>> GetPostByLocation(int currentLocationId)
     {
         var posts = await _postRepository.GetPostsByLocationIdAsync(currentLocationId);
@@ -156,29 +157,54 @@ public class PostService : IPostService
         return posts.Count();
     }
 
-    public async Task<PostResponseDTO> GetPostByIdAsync(int idPost)
+    public async Task<ResponseDTO<PostResponseDTO>> GetPostByIdAsync(int idPost)
     {
-        var post =  await _postRepository.GetByIdAsync(idPost);
+        var post = await _postRepository.GetByIdAsync(idPost);
         if (post == null)
         {
-            return null;
+            return new ResponseDTO<PostResponseDTO>
+            {
+                Success = false,
+                Message = "El post no existe.",
+                Data = null
+            };
         }
 
-        return new PostResponseDTO()
+        return new ResponseDTO<PostResponseDTO>
         {
-            Id = post.Id,
-            Description = post.Description,
-            CreatedAt = post.CreatedAt.ToString("hh:mm tt"),
-            PosterUserName = post.PosterUser?.Name ?? "Usuario desconocido",
-            DeliveryLocation = post.DeliveryLocation?.Name ?? "Ubicación no disponible",
-            PickUpLocation = post.PickUpLocation?.Name ?? "Ubicación no disponible",
-            SuggestedValue = post.SugestedValue
+            Success = true,
+            Message = "El post fue encontrado correctamente.",
+            Data = new PostResponseDTO
+            {
+                Id = post.Id,
+                Description = post.Description,
+                CreatedAt = post.CreatedAt.ToString("yyyy-MM-dd HH:mm"),
+                PosterUserName = post.PosterUser?.Name ?? "Usuario desconocido",
+                DeliveryLocation = post.DeliveryLocation?.Name ?? "Ubicación no disponible",
+                PickUpLocation = post.PickUpLocation?.Name ?? "Ubicación no disponible",
+                SuggestedValue = post.SugestedValue,
+                Title = post.Title,
+                Completed = post.Completed,
+                Accepted = post.Accepted,
+            }
+        };
+    }
+
+    public async Task<ResponseDTO<bool>> MarkAsAcceptedAsync(int idPost)
+    {
+        var success = await _postRepository.MarkAsAcceptedAsync(idPost);
+
+        return new ResponseDTO<bool>
+        {
+            Success = success,
+            Message = success ? "El post fue marcado como completado." : "No se pudo marcar el post como completado.",
+            Data = success
         };
     }
 
     public async Task<IEnumerable<PostResponseDTO>> GetActivePosts()
     {
-        var userId = _authenticatedUserService.GetAuthenticatedUserId(); 
+        var userId = _authenticatedUserService.GetAuthenticatedUserId();
         var posts = await _postRepository.GetPostsActive(userId);
 
         var postDtos = posts.Select(p => new PostResponseDTO

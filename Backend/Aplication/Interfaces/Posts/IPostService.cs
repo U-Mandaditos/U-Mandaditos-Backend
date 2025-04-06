@@ -11,7 +11,8 @@ public interface IPostService
     Task<ResponseDTO<IEnumerable<PostResponseDTO>>> GetAllNearAsync(int currentLocationId);
     Task<IEnumerable<PostResponseDTO>> GetPostsByPosterUserIdAsync(int idPosterUser);
     Task<int> GetPostsCountAsync(int idPosterUser);
-    Task<PostResponseDTO> GetPostByIdAsync(int idPost);
+    Task<ResponseDTO<PostResponseDTO>> GetPostByIdAsync(int idPost);
     Task<IEnumerable<PostResponseDTO>> GetActivePosts();
+    Task<ResponseDTO<bool>> MarkAsAcceptedAsync(int idPost);
 
 }

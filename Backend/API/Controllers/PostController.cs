@@ -61,10 +61,10 @@ public class PostController : ControllerBase
         return Ok(posts);
     }
     
-    [HttpGet("post/{id}")]
-    public async Task<IActionResult> GetPostById([FromQuery] int idPost)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetPostById(int id)
     {
-        var post = await _postService.GetPostByIdAsync(idPost);
+        var post = await _postService.GetPostByIdAsync(id);
         return Ok(post);
     }
     
@@ -73,5 +73,19 @@ public class PostController : ControllerBase
     {
         var post = await _postService.GetActivePosts();
         return Ok(post);
+    }
+
+    [HttpPatch("{id:int}/accepted")]
+    public async Task<IActionResult> MarkAsAccepted(int id)
+    {
+        try
+        {
+            var post = await _postService.MarkAsAcceptedAsync(id);
+            return Ok(post);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, $"Error interno del servidor: {e.Message}");
+        }
     }
 }

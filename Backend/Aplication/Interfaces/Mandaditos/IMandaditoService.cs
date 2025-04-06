@@ -8,7 +8,7 @@ public interface IMandaditoService
 {
     Task<ResponseDTO<MandaditoResponseDTO?>> GetByIdAsync(int id);
     Task<IEnumerable<MandaditoHistoryResponseDTO>?> GetHistoryAsync(int userId);
-    Task<MandaditoResponseMinDTO?> CreateAsync(MandaditoRequestDTO dto);
+    Task<ResponseDTO<MandaditoResponseMinDTO?>> CreateAsync(MandaditoRequestDTO dto);
     Task<Dictionary<string, List<Mandadito>>> Execute();
     Task<Dictionary<string, List<Mandadito>>> ExecuteGet();
 }

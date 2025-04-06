@@ -26,7 +26,7 @@ public class OfferController : ControllerBase
     }
 
     /* Obtiene todas las ofertas de un determinado post */
-    [HttpGet("/posts/{id:int}/offers")]
+    [HttpGet("posts/{id:int}/offers")]
     public async Task<ActionResult> GetOfferByPostId(int id)
     {
         var offers = await _offerservice.GetOffersByPostIdAsync(id);

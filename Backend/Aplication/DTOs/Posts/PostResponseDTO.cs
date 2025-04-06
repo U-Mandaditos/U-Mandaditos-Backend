@@ -12,4 +12,6 @@ public class PostResponseDTO
     
     public string PickUpLocation { get; set; }
     public string DeliveryLocation { get; set; }
+    public bool Completed { get; set; }
+    public bool Accepted { get; set; } = false;
 }
