@@ -11,7 +11,7 @@ using Aplication.Interfaces.Posts;
 using Aplication.Interfaces.Users;
 using Aplication.Interfaces.Mandaditos;
 using Domain.Entities;
-using Aplication.DTOs.Users.PublicProfile;
+using Aplication.DTOs.Users.Profile;
 namespace Aplication.Services;
 
 public class UserService : IUserService
@@ -168,7 +168,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<ResponseDTO<UserPublicProfileInfoResponseDTO>> GetPublicProfileInfoAsync()
+    public async Task<ResponseDTO<UserPrivateProfileInfoResponseDTO>> GetPrivateProfileInfoAsync()
     {
         try
         {
@@ -177,7 +177,7 @@ public class UserService : IUserService
 
             if (user is null)
             {
-                return new ResponseDTO<UserPublicProfileInfoResponseDTO>
+                return new ResponseDTO<UserPrivateProfileInfoResponseDTO>
                 {
                     Success = false,
                     Message = $"Usuario con id={userId} no encontrado"
@@ -220,7 +220,82 @@ public class UserService : IUserService
                 Deliveries = cantDeliveries
             };
 
-            var reviews = await _ratingRepository.GetByRatedUserAsync(userId);
+            var data = new UserPrivateProfileInfoResponseDTO
+            {
+                User = userR,
+                Stats = statsR
+            };
+
+            return new ResponseDTO<UserPrivateProfileInfoResponseDTO>
+            {
+                Success = true,
+                Message = $"La información del usuario con id={userId} fue obtenida satisfactoriamente",
+                Data = data
+            };
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return new ResponseDTO<UserPrivateProfileInfoResponseDTO>
+            {
+                Success = false,
+                Message = $"Ocurrió un error al obtener al usuario"
+            };
+        }
+    }
+    
+    public async Task<ResponseDTO<UserPublicProfileInfoResponseDTO>> GetPublicProfileInfoAsync(int idUser)
+    {
+        try
+        {
+            var user = await _userRepository.GetByIdAsync(idUser);
+
+            if (user is null)
+            {
+                return new ResponseDTO<UserPublicProfileInfoResponseDTO>
+                {
+                    Success = false,
+                    Message = $"Usuario con id={idUser} no encontrado"
+                };
+            }
+
+            var userR = new UserProfileResponseDTO
+            {
+                Name = user.Name,
+                Dni = user.Dni,
+                Email = user.Email,
+                BirthDay = user.BirthDay.ToString("yy-MM-dd"),
+                Edad = CalculateAge(user.BirthDay),
+                Score = user.Rating,
+                ProfilePic = new MediaResponseDTO
+                {
+                    Id = user.ProfilePic.Id,
+                    Name = user.ProfilePic.Name,
+                    Link = user.ProfilePic.Link
+                },
+                LastLocation = user.LastLocation != null ? new LastLocationUserDTO
+                {
+                    Description = user.LastLocation.Description,
+                    Name = user.LastLocation.Name,
+                    Id = user.LastLocation.Id
+                } : null,
+                Career = new CareerResponseDTO
+                {
+                    Id = user.Career.Id,
+                    Name = user.Career.Name
+                }
+            };
+
+            var cantPosts = await _postService.GetPostsCountAsync(idUser);
+            var cantDeliveries = await _mandaditoRepository.DeliveriesCount(idUser);
+
+            var statsR = new UserStatsResponseDTO
+            {
+                Posts = cantPosts,
+                Deliveries = cantDeliveries
+            };
+
+            var reviews = await _ratingRepository.GetByRatedUserAsync(idUser);
 
             var reviewsR = reviews.Select(r => new UserReviewsResponseDTO
             {
@@ -229,7 +304,7 @@ public class UserService : IUserService
                 {
                     Name = r.RaterUser.Name,
                     Image = r.RaterUser.ProfilePic.Link,
-                    Stars = r.RaterUser.Rating
+                    Stars = r.RatingNum
                 },
                 Comment = r.Review,
                 CommentDate = r.CreatedAt.ToString("dd-MM-yyyy"),
@@ -246,7 +321,7 @@ public class UserService : IUserService
             return new ResponseDTO<UserPublicProfileInfoResponseDTO>
             {
                 Success = true,
-                Message = $"La información del usuario con id={userId} fue obtenida satisfactoriamente",
+                Message = $"La información del usuario con id={idUser} fue obtenida satisfactoriamente",
                 Data = data
             };
         }
@@ -256,7 +331,7 @@ public class UserService : IUserService
             return new ResponseDTO<UserPublicProfileInfoResponseDTO>
             {
                 Success = false,
-                Message = $"Ocurrió un error al obtener al usuario"
+                Message = $"Ocurrió un error al obtener al usuario con id={idUser}"
             };
         }
     }

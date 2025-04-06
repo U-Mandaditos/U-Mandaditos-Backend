@@ -50,12 +50,27 @@ public class UserController: ControllerBase
     }
 
     [Authorize]
-    [HttpGet("publicProfile")]
-    public async Task<IActionResult> GetPublicProfileInfoAsync()
+    [HttpGet("publicProfile/{idUser}")]
+    public async Task<IActionResult> GetPublicProfileInfoAsync(int idUser)
     {
         try
         {
-            var res = await _userService.GetPublicProfileInfoAsync();
+            var res = await _userService.GetPublicProfileInfoAsync(idUser);
+            return Ok(res);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error interno del servidor: {ex.Message}");
+        }
+    }
+    
+    [Authorize]
+    [HttpGet("privateProfile")]
+    public async Task<IActionResult> GetPrivateProfileInfoAsync()
+    {
+        try
+        {
+            var res = await _userService.GetPrivateProfileInfoAsync();
             return Ok(res);
         }
         catch (Exception ex)
