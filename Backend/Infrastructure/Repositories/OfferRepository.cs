@@ -27,7 +27,9 @@ namespace Infrastructure.Repositories
 
         public async Task<Offer?> GetByIdAsync(int id)
         {
-            return await _context.Offers.FindAsync(id);
+            return await _context.Offers
+                .Include(o => o.Post)
+                .FirstOrDefaultAsync(o => o.Id == id);
         }
 
         public async Task AddAsync(Offer offer)

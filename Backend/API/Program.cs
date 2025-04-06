@@ -1,5 +1,8 @@
 using System.Text;
 using API.Configuration;
+using API.Hubs;
+using API.Services;
+using Aplication.Interfaces.Helpers;
 using Infrastructure;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -109,6 +112,7 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.AddDbContext<BackendDbContext>(options => options.UseSqlServer(dbConfig.ConnectionString));
 
 builder.Services.AddInfrastructure();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddControllers();
 
@@ -116,7 +120,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
+
+app.MapHub<HubRequest>("/hubRequest");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
