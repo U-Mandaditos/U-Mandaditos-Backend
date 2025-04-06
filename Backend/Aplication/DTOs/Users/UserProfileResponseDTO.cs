@@ -9,6 +9,8 @@ namespace Aplication.DTOs.Users
         public string? Dni { get; set; } = string.Empty;
         public string? Email { get; set; } = string.Empty;
         public string BirthDay { get; set; }
+
+        public int Edad { get; set; }
         public int Score { get; set; }
 
         public MediaResponseDTO? ProfilePic { get; set; }

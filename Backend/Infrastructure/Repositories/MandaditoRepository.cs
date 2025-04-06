@@ -154,5 +154,23 @@ namespace Infrastructure.Repositories
             _context.Mandaditos.Update(mandadito);
             return await _context.SaveChangesAsync() > 0;
         }
+        
+        public async Task<int> DeliveriesCount(int idUser)
+        {
+
+            var count = await _context.Mandaditos
+                .Join(
+                    _context.Offers,
+                    mandadito => mandadito.IdOffer,
+                    offer => offer.Id,
+                    (mandadito, offer) => new { mandadito, offer }
+                    )
+                .Where(m => m.offer.IdUserCreator == idUser && m.offer.Accepted == true)
+                .CountAsync();
+     
+            Console.WriteLine($"{count}");
+
+            return count;
+        }
     }
 }

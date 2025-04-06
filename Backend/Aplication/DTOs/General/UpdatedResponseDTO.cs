@@ -2,6 +2,6 @@
 {
     public class UpdatedResponseDTO
     {
-        public bool Updated;
+        public bool Updated { set; get; }
     }
 }

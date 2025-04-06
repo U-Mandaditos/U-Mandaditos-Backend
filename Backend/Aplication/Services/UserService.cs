@@ -7,9 +7,11 @@ using Aplication.Interfaces;
 using Aplication.Interfaces.Auth;
 using Aplication.Interfaces.Helpers;
 using Aplication.Interfaces.Locations;
+using Aplication.Interfaces.Posts;
 using Aplication.Interfaces.Users;
+using Aplication.Interfaces.Mandaditos;
 using Domain.Entities;
-
+using Aplication.DTOs.Users.PublicProfile;
 namespace Aplication.Services;
 
 public class UserService : IUserService
@@ -20,13 +22,19 @@ public class UserService : IUserService
     private readonly IFirebaseStorageService _firebaseService;
     private readonly IPasswordHasherService _passwordHasherService;
     private readonly IAuthenticatedUserService _authenticatedUserService;
+    private readonly IPostService _postService;
+    private readonly IMandaditoRepository _mandaditoRepository;
+    private readonly IRatingRepository _ratingRepository;
 
     public UserService(IUserRepository userRepository,  
         IFirebaseStorageService firebaseService, 
         ICareerRepository careerRepository, 
         ILocationRepository locationRepository, 
         IPasswordHasherService passwordHasherService,
-        IAuthenticatedUserService authenticatedUserService)
+        IAuthenticatedUserService authenticatedUserService,
+        IPostService postService,
+        IMandaditoRepository mandaditoRepository,
+        IRatingRepository ratingRepository)
     {
         _userRepository = userRepository;
         _firebaseService = firebaseService;
@@ -34,6 +42,9 @@ public class UserService : IUserService
         _locationRepository = locationRepository;
         _passwordHasherService = passwordHasherService;
         _authenticatedUserService = authenticatedUserService;
+        _postService = postService;
+        _mandaditoRepository = mandaditoRepository;
+        _ratingRepository = ratingRepository;
     }
     public async Task<ResponseDTO<UserResponseDTO>> CreateUserAsync(UserRequestDTO userRequest)
     {
@@ -157,27 +168,29 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<ResponseDTO<UserPublicProfileInfoResponseDTO>> GetPublicProfileInfoAsync(int id)
+    public async Task<ResponseDTO<UserPublicProfileInfoResponseDTO>> GetPublicProfileInfoAsync()
     {
         try
         {
-            var user = await _userRepository.GetByIdAsync(id);
+            var userId = _authenticatedUserService.GetAuthenticatedUserId();
+            var user = await _userRepository.GetByIdAsync(userId);
 
             if (user is null)
             {
                 return new ResponseDTO<UserPublicProfileInfoResponseDTO>
                 {
                     Success = false,
-                    Message = $"Usuario con id={id} no encontrado"
+                    Message = $"Usuario con id={userId} no encontrado"
                 };
             }
 
-            var data = new UserPublicProfileInfoResponseDTO
+            var userR = new UserProfileResponseDTO
             {
                 Name = user.Name,
                 Dni = user.Dni,
                 Email = user.Email,
                 BirthDay = user.BirthDay.ToString("yy-MM-dd"),
+                Edad = CalculateAge(user.BirthDay),
                 Score = user.Rating,
                 ProfilePic = new MediaResponseDTO
                 {
@@ -198,10 +211,42 @@ public class UserService : IUserService
                 }
             };
 
+            var cantPosts = await _postService.GetPostsCountAsync(userId);
+            var cantDeliveries = await _mandaditoRepository.DeliveriesCount(userId);
+
+            var statsR = new UserStatsResponseDTO
+            {
+                Posts = cantPosts,
+                Deliveries = cantDeliveries
+            };
+
+            var reviews = await _ratingRepository.GetByRatedUserAsync(userId);
+
+            var reviewsR = reviews.Select(r => new UserReviewsResponseDTO
+            {
+                Id = r.Id,
+                User = new UserInfoForReviewDTO
+                {
+                    Name = r.RaterUser.Name,
+                    Image = r.RaterUser.ProfilePic.Link,
+                    Stars = r.RaterUser.Rating
+                },
+                Comment = r.Review,
+                CommentDate = r.CreatedAt.ToString("dd-MM-yyyy"),
+                IsPosted = r.IdRatedRole == 1 ? true : false
+            }).ToList();
+
+            var data = new UserPublicProfileInfoResponseDTO
+            {
+                User = userR,
+                Stats = statsR,
+                Reviews = reviewsR
+            };
+
             return new ResponseDTO<UserPublicProfileInfoResponseDTO>
             {
                 Success = true,
-                Message = $"La información del usuario con id={id} fue obtenida satisfactoriamente",
+                Message = $"La información del usuario con id={userId} fue obtenida satisfactoriamente",
                 Data = data
             };
         }
@@ -211,7 +256,7 @@ public class UserService : IUserService
             return new ResponseDTO<UserPublicProfileInfoResponseDTO>
             {
                 Success = false,
-                Message = $"Ocurrió un error al obtener al usuario con id={id}"
+                Message = $"Ocurrió un error al obtener al usuario"
             };
         }
     }
@@ -522,5 +567,21 @@ public class UserService : IUserService
             Console.WriteLine($"Ocurrió un error al buscar el usuario con email={email}: {e.Message}");
             return null; // Return null in case of an exception
         }
+    }
+
+    public int CalculateAge(DateTime fechaNacimiento)
+    {
+        var now = DateTime.Today;
+
+        // Calculamos la diferencia en años entre la fecha de nacimiento y la fecha actual
+        var age = now.Year - fechaNacimiento.Year;
+
+        // Si el cumpleaños aún no ha ocurrido este año, restamos 1
+        if (now < fechaNacimiento.AddYears(age))
+        {
+            age--;
+        }
+
+        return age;
     }
 }

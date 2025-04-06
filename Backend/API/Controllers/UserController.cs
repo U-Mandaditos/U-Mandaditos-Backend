@@ -50,12 +50,12 @@ public class UserController: ControllerBase
     }
 
     [Authorize]
-    [HttpGet("publicProfile/{id}")]
-    public async Task<IActionResult> GetPublicProfileInfoAsync(int id)
+    [HttpGet("publicProfile")]
+    public async Task<IActionResult> GetPublicProfileInfoAsync()
     {
         try
         {
-            var res = await _userService.GetByIdAsync(id);
+            var res = await _userService.GetPublicProfileInfoAsync();
             return Ok(res);
         }
         catch (Exception ex)

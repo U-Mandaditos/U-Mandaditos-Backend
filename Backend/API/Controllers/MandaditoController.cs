@@ -24,6 +24,13 @@ public class MandaditoController : ControllerBase
         return mandadito is null ? NotFound($"El mandadito con id {id} no existe.") : Ok(mandadito);
     }
     
+    [HttpGet("deliveries/count/{idUser}")]
+    public async Task<ActionResult> DeliveriesCount(int idUser)
+    {
+        var cant = await _mandaditoService.DeliveriesCount(idUser);
+        return Ok(cant);
+    }
+    
     [HttpGet("history/get")]
     public async Task<IActionResult> GetHistory([FromQuery] int userId)
     {

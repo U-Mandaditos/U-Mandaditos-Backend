@@ -203,4 +203,9 @@ public class MandaditoService : IMandaditoService
         var userId = _authenticatedUserService.GetAuthenticatedUserId();
         return await _mandaditoRepository.GetHistoryMandaditosLikeRunner(userId);
     }
+    
+    public async Task<int> DeliveriesCount(int idUser)
+    {
+        return await _mandaditoRepository.DeliveriesCount(idUser);
+    }
 }
