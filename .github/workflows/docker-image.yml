@@ -1,14 +1,12 @@
 name: Docker Image CI
 
 on:
-#  push:
-#    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted  # Usar runner self-hosted
 
     permissions:
       contents: read
@@ -27,13 +25,23 @@ jobs:
 
     - name: Build and tag Docker image
       run: |
-        REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        IMAGE_NAME=ghcr.io/${REPO_LOWER}/api:dev
-        echo "Building $IMAGE_NAME"
-        docker build --no-cache -t $IMAGE_NAME -f Backend/API/Dockerfile Backend
+        # Obtener el nombre del repositorio dinámicamente
+        $repo = "${{ github.repository }}".ToLower()
+        
+        # Construir el nombre de la imagen
+        $imageName = "ghcr.io/$repo/api:dev"
+        Write-Host "Building $imageName"
+        
+        # Construir la imagen Docker
+        docker build --no-cache -t $imageName -f Backend/API/Dockerfile Backend
 
     - name: Push Docker image to GitHub Container Registry
       run: |
-        REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        IMAGE_NAME=ghcr.io/${REPO_LOWER}/api:dev
-        docker push $IMAGE_NAME
+        # Obtener el nombre del repositorio dinámicamente
+        $repo = "${{ github.repository }}".ToLower()
+
+        # Construir el nombre de la imagen
+        $imageName = "ghcr.io/$repo/api:dev"
+        
+        # Empujar la imagen Docker al registro de GitHub
+        docker push $imageName
