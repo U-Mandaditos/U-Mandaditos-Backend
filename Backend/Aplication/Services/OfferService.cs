@@ -6,6 +6,7 @@ using Aplication.Interfaces.Auth;
 using Aplication.Interfaces.Posts;
 using Domain.Entities;
 using Aplication.DTOs.General;
+using Aplication.Interfaces.Helpers;
 
 
 namespace Aplication.Services
@@ -15,12 +16,14 @@ namespace Aplication.Services
         private readonly IOfferRepository _offerRepository;
         private readonly IAuthenticatedUserService _authenticatedUserService;
         private readonly IPostRepository _postRepository;
+        private readonly INotificationService _notificationService;
 
-        public OfferService(IOfferRepository offerRepository, IAuthenticatedUserService authenticatedUserService, IPostRepository postRepository)
+        public OfferService(IOfferRepository offerRepository, IAuthenticatedUserService authenticatedUserService, IPostRepository postRepository, INotificationService notificationService)
         {
             _offerRepository = offerRepository;
             _authenticatedUserService = authenticatedUserService;
             _postRepository = postRepository;
+            _notificationService = notificationService;
         }
 
         public async Task<OfferResponseDTO?> GetOfferByIdAsync(int id)
@@ -121,7 +124,7 @@ namespace Aplication.Services
         {
             var offer = await _offerRepository.GetByIdAsync(id);
 
-            if (offer is null)
+            if (offer is null && offer.Post is null)
             {
                 return null;
             }
@@ -129,6 +132,9 @@ namespace Aplication.Services
             offer.Accepted = state;
 
             await _offerRepository.UpdateAsync(offer);
+            
+            // Enviar notificación al usuario
+            await _notificationService.SendAcceptedOfferNotification(offer.Post.Id.ToString(), offer.Id.ToString());
 
             return new OfferResponseDTO
             {
