@@ -1,6 +1,7 @@
 using Aplication.Interfaces;
 using Aplication.DTOs;
 using Domain.Entities;
+using Aplication.DTOs.General;
 
 public class RatingService : IRatingService
 {
@@ -12,29 +13,36 @@ public class RatingService : IRatingService
         _ratingRepository = ratingRepository;
     }
 
-    public async Task<RatingResponseDTO> CreateAsync(RatingRequestDTO ratingRequest)
+    public async Task<ResponseDTO<RatingResponseDTO>> CreateAsync(RatingRequestDTO ratingRequest)
     {
         var rating = new Rating
         {
+            IdMandadito = ratingRequest.IdMandadito,
             IdRater = ratingRequest.IdRater,
             IdRatedUser = ratingRequest.IdRatedUser,
             RatingNum = ratingRequest.RatingNum,
             Review = ratingRequest.Review,
-            IdRatedRole = ratingRequest.IdRatedRole
+            IdRatedRole = ratingRequest.IsOwner ? 1 : 2,
         };
 
         await _ratingRepository.AddAsync(rating);
-
-        return new RatingResponseDTO
+        return new ResponseDTO<RatingResponseDTO>
         {
-            Id = rating.Id,
-            UserName = rating.RaterUser?.Name ?? "Unknown",
-            ProfilePic = rating.RaterUser?.ProfilePic?.Link ?? "Unknown",
-            Score = rating.RatingNum,
-            Review = rating.Review,
-            DatePosted = rating.CreatedAt.ToString("g"),
-            isRunner = rating.RatedRole?.Name == "Runner" ? true : false
+            Success = true,
+            Message = "Reseña creada con éxito.",
+            Data = new RatingResponseDTO
+            {
+                Id = rating.Id,
+                UserName = rating.RaterUser?.Name ?? "Unknown",
+                ProfilePic = rating.RaterUser?.ProfilePic?.Link ?? "Unknown",
+                Score = rating.RatingNum,
+                Review = rating.Review,
+                DatePosted = rating.CreatedAt.ToString("g"),
+                isRunner = rating.RatedRole?.Name == "Runner" ? true : false
+            }
         };
+
+
     }
 
     /* Obtiene todas las reseñas de un usuario que ha sido evaluado */

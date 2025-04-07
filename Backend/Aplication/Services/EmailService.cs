@@ -30,9 +30,21 @@ namespace Application.Services
                 message.To.Add(new MailboxAddress("", email));
                 message.Subject = "Código de Confirmación";
 
-                message.Body = new TextPart("plain")
+                message.Body = new TextPart("html")
                 {
-                    Text = $"Tu código de confirmación es: {code}"
+                    Text = $@"
+                        <html>
+                        <body style='font-family: Arial, sans-serif; background-color: #F7F1EC; padding: 20px; color: #363433;'>
+                            <div style='max-width: 600px; margin: auto; background-color: #ffffff; border-left: 5px solid #D3624B; padding: 20px; border-radius: 8px;'>
+                                <h2 style='color: #D3624B;'>Código de Confirmación</h2>
+                                <p style='color: #928E8D;'>Hola,</p>
+                                <p style='font-size: 16px;'>Tu código de confirmación es:</p>
+                                <p style='font-size: 24px; font-weight: bold; color: #679693; text-align: center;'>{code}</p>
+                                <hr style='border: none; border-top: 1px solid #D9D9D9; margin: 20px 0;' />
+                                <p style='font-size: 12px; color: #928E8D;'>Si no solicitaste este código, podés ignorar este mensaje.</p>
+                            </div>
+                        </body>
+                        </html>"
                 };
 
                 using (var client = new SmtpClient())

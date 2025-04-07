@@ -1,9 +1,10 @@
 using Aplication.DTOs;
+using Aplication.DTOs.General;
 
 namespace Aplication.Interfaces {
     public interface IRatingService
     {
-        Task<RatingResponseDTO> CreateAsync(RatingRequestDTO ratingRequestDTO);
+        Task<ResponseDTO<RatingResponseDTO>> CreateAsync(RatingRequestDTO ratingRequestDTO);
         Task<bool> UpdateAsync(int id, RatingRequestDTO ratingRequestDTO);
         Task<bool> DeleteAsync(int id);
         Task<RatingResponseDTO?> GetByIdAsync(int id);

@@ -13,4 +13,5 @@ public interface IPostRepository
     Task<IEnumerable<Post>> GetPostsByPosterUserId(int idPosterUser);
     Task<IEnumerable<Post>> GetPostsActive(int idPosterUser);
     Task<bool> MarkAsAcceptedAsync(int idPost);
+    Task<bool> MarkAsCompleted(int idPost);
 }

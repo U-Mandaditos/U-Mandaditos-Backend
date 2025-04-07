@@ -203,9 +203,88 @@ public class MandaditoService : IMandaditoService
         var userId = _authenticatedUserService.GetAuthenticatedUserId();
         return await _mandaditoRepository.GetHistoryMandaditosLikeRunner(userId);
     }
-    
+
     public async Task<int> DeliveriesCount(int idUser)
     {
         return await _mandaditoRepository.DeliveriesCount(idUser);
+    }
+
+    public async Task<ResponseDTO<IEnumerable<MandaditoRunnerResposeDTO>?>> GetActivesByRunnerId()
+    {
+        var userId = _authenticatedUserService.GetAuthenticatedUserId();
+        var mandaditos = await _mandaditoRepository.GetActivesByRunnerId(userId);
+
+        if (mandaditos == null || !mandaditos.Any())
+        {
+            return new ResponseDTO<IEnumerable<MandaditoRunnerResposeDTO>?>
+            {
+                Success = false,
+                Message = "No active mandaditos found",
+                Data = null
+            };
+        }
+
+        var mandaditosResponse = mandaditos.Select(m => new MandaditoRunnerResposeDTO
+        {
+            Id = m.Id,
+            Title = m.Post!.Description,
+            Description = m.Post!.Description,
+            SuggestedValue = m.Post!.SugestedValue,
+            PosterUserName = m.Post!.PosterUser!.Name,
+            CreatedAt = m.AcceptedAt.ToString("hh:mm tt"),
+            PickUpLocation = m.Post?.PickUpLocation?.Name ?? "Desconocido",
+            DeliveryLocation = m.Post?.DeliveryLocation?.Name ?? "Desconocido",
+            Completed = m.Post!.Completed,
+            Accepted = m.Post.Accepted,
+        });
+
+        return new ResponseDTO<IEnumerable<MandaditoRunnerResposeDTO>?>
+        {
+            Success = true,
+            Message = "Mandaditos found successfully",
+            Data = mandaditosResponse
+        };
+    }
+
+    public async Task<ResponseDTO<MandaditoPostResponseDTO?>> GetByPostIdAsync(int idPost)
+    {
+        var mandadito = await _mandaditoRepository.GetByPostIdAsync(idPost);
+
+        if (mandadito == null)
+        {
+            return new ResponseDTO<MandaditoPostResponseDTO?>()
+            {
+                Success = false,
+                Message = "Mandadito not found",
+                Data = null
+            };
+
+        }
+
+        var mandaditosResponse = new MandaditoPostResponseDTO
+        {
+            Id = mandadito.Id,
+            IdPost = mandadito.IdPost,
+            IdUser = mandadito.Offer!.UserCreator!.Id,
+            PosterImage = mandadito.Post!.PosterUser!.ProfilePic?.Link ?? string.Empty,
+            Title = mandadito.Post.Title,
+            Description = mandadito.Post.Description,
+            SuggestedValue = mandadito.Post.SugestedValue,
+            PosterUserName = mandadito.Post.PosterUser.Name,
+            CreatedAt = mandadito.AcceptedAt.ToString("hh:mm tt"),
+            PickUpLocation = mandadito.Post?.PickUpLocation?.Name ?? "Desconocido",
+            DeliveryLocation = mandadito.Post?.DeliveryLocation?.Name ?? "Desconocido",
+            Completed = mandadito.Post!.Completed,
+            Accepted = mandadito.Post.Accepted,
+        };
+
+        return new ResponseDTO<MandaditoPostResponseDTO?>()
+        {
+            Success = true,
+            Message = "Mandadito found successfully",
+            Data = mandaditosResponse
+        };
+
+
     }
 }

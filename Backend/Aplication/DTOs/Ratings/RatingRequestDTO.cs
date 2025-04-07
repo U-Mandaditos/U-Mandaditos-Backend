@@ -2,6 +2,7 @@ namespace Aplication.DTOs
 {
     public class RatingRequestDTO
     {
+        public int IdMandadito { get; set; }
         public int IdRater { get; set; }
 
         public int IdRatedUser { get; set; }
@@ -10,7 +11,8 @@ namespace Aplication.DTOs
 
         public string Review { get; set; } = string.Empty;
 
-        public int IdRatedRole { get; set; }
+        public bool IsOwner { get; set; }
+
 
     }
 }

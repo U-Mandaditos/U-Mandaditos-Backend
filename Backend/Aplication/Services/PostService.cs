@@ -157,12 +157,12 @@ public class PostService : IPostService
         return posts.Count();
     }
 
-    public async Task<ResponseDTO<PostResponseDTO>> GetPostByIdAsync(int idPost)
+    public async Task<ResponseDTO<PostExtendedResponseDTO>> GetPostByIdAsync(int idPost)
     {
         var post = await _postRepository.GetByIdAsync(idPost);
         if (post == null)
         {
-            return new ResponseDTO<PostResponseDTO>
+            return new ResponseDTO<PostExtendedResponseDTO>
             {
                 Success = false,
                 Message = "El post no existe.",
@@ -170,11 +170,11 @@ public class PostService : IPostService
             };
         }
 
-        return new ResponseDTO<PostResponseDTO>
+        return new ResponseDTO<PostExtendedResponseDTO>
         {
             Success = true,
             Message = "El post fue encontrado correctamente.",
-            Data = new PostResponseDTO
+            Data = new PostExtendedResponseDTO
             {
                 Id = post.Id,
                 Description = post.Description,
@@ -186,6 +186,8 @@ public class PostService : IPostService
                 Title = post.Title,
                 Completed = post.Completed,
                 Accepted = post.Accepted,
+                IdUser = post.IdPosterUser ?? 0,
+                PosterImage = post.PosterUser?.ProfilePic?.Link ?? string.Empty
             }
         };
     }
@@ -220,5 +222,17 @@ public class PostService : IPostService
         }).ToList();
 
         return postDtos;
+    }
+
+    public async Task<ResponseDTO<bool>> MarkAsCompletedAsync(int idPost)
+    {
+        var success = await _postRepository.MarkAsCompleted(idPost);
+
+        return new ResponseDTO<bool>
+        {
+            Success = success,
+            Message = success ? "El post fue marcado como completado." : "No se pudo marcar el post como completado.",
+            Data = success
+        };
     }
 }
