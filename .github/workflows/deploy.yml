@@ -29,9 +29,13 @@ jobs:
     - name: Create .env file from GitHub Variable
       shell: powershell
       run: |
-        Set-Content -Path .env -Value "${{ vars.ENV_FILE }}"
-        Write-Host "Generated .env:"
-        Get-Content .env
+        $envContent = "${{ vars.ENV_FILE }}"
+        if ([string]::IsNullOrEmpty($envContent)) {
+          Write-Host "Error: ENV_FILE variable is empty!"
+          exit 1
+        }
+        Set-Content -Path .env -Value $envContent
+        Write-Host "Generated .env with content length: $($envContent.Length)"
 
     - name: Run container with .env
       shell: powershell
