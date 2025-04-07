@@ -74,16 +74,14 @@ jobs:
         Write-Host "Montando volumen desde: $hostPath"
         Write-Host "Contenido del directorio:"
         Get-ChildItem $hostPath
-        
-        # Ejecutar contenedor con mapeo correcto
-        docker run `
-          --env-file .env `
+    
+        # Ejecutar contenedor
+        docker run --env-file .env `
           -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" `
-          -v "${hostPath}:/app/Infrastructure" `
+          -v "$hostPath:/app/Infrastructure" `
           -d -p 9090:8080 `
           --name api_container `
           $imageName
-        
-        # Verificar que el archivo existe dentro del contenedor
+    
         docker exec api_container ls -la /app/Infrastructure
-        docker exec api_container cat /app/Infrastructure/umandaditos_firebase.json | head -n 3
+        docker exec api_container cat /app/Infrastructure/umandaditos_firebase.json | Select-String -First 3
