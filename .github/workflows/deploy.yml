@@ -41,7 +41,7 @@ jobs:
       shell: powershell
       run: |
         # Decodificar y guardar el archivo
-        $firebasePath = "Infrastructure/umandaditos_firebase.json"
+        $firebasePath = "Backend/Infrastructure/umandaditos_firebase.json"
         $decoded = [System.Convert]::FromBase64String("${{ vars.FIREBASE_CREDENTIALS_BASE64 }}")
         [System.IO.File]::WriteAllBytes($firebasePath, $decoded)
         
