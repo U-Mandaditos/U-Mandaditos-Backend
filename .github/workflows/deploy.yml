@@ -67,6 +67,7 @@ jobs:
           --name api_container \
           $imageName
 
+
     - name: Run container with .env
       shell: powershell
       run: |
