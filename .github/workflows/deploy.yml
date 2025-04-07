@@ -64,15 +64,26 @@ jobs:
       run: |
         $repo = "${{ github.repository }}".ToLower()
         $imageName = "ghcr.io/$repo/api:dev"
-    
+        
+        # Detener y eliminar contenedor existente
         docker ps -a -q -f name=api_container | ForEach-Object { docker rm -f $_ }
-        Write-Host "Running container from image: $imageName"
-    
+        
+        # Crear ruta absoluta para el volumen
+        $hostPath = Convert-Path -Path "$env:GITHUB_WORKSPACE/Backend/Infrastructure"
+        
+        Write-Host "Montando volumen desde: $hostPath"
+        Write-Host "Contenido del directorio:"
+        Get-ChildItem $hostPath
+        
+        # Ejecutar contenedor con mapeo correcto
         docker run `
           --env-file .env `
           -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" `
-          -v "$env:GITHUB_WORKSPACE/Backend/Infrastructure:/app/Infrastructure" `
+          -v "${hostPath}:/app/Infrastructure" `
           -d -p 9090:8080 `
           --name api_container `
           $imageName
-
+        
+        # Verificar que el archivo existe dentro del contenedor
+        docker exec api_container ls -la /app/Infrastructure
+        docker exec api_container cat /app/Infrastructure/umandaditos_firebase.json | head -n 3
