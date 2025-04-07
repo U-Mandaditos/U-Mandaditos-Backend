@@ -60,19 +60,19 @@ jobs:
         Write-Host "Primeras líneas: $(Get-Content $firebasePath -Head 3)"
 
     - name: Run container
-      run: |
-        docker run \
-          -v "$env:GITHUB_WORKSPACE/Backend/Infrastructure:/app/Infrastructure" \
-          -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" \
-          -d -p 9090:8080 \
-          --name api_container \
-          $imageName
-
-    - name: Run container with .env
       shell: powershell
       run: |
         $repo = "${{ github.repository }}".ToLower()
         $imageName = "ghcr.io/$repo/api:dev"
+    
         docker ps -a -q -f name=api_container | ForEach-Object { docker rm -f $_ }
         Write-Host "Running container from image: $imageName"
-        docker run --env-file .env -d -p 9090:8080 --name api_container $imageName
+    
+        docker run `
+          --env-file .env `
+          -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" `
+          -v "$env:GITHUB_WORKSPACE/Backend/Infrastructure:/app/Infrastructure" `
+          -d -p 9090:8080 `
+          --name api_container `
+          $imageName
+
