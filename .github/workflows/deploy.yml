@@ -1,0 +1,43 @@
+name: Deploy App Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pull image from GHCR
+      shell: powershell
+      run: |
+        $repo = "${{ github.repository }}".ToLower()
+        $imageName = "ghcr.io/$repo/api:dev"
+        Write-Host "Pulling image: $imageName"
+        docker pull $imageName
+
+    - name: Create .env file from GitHub Variable
+      shell: powershell
+      run: |
+        Set-Content -Path .env -Value "${{ vars.ENV_FILE }}"
+        Write-Host "Generated .env:"
+        Get-Content .env
+
+    - name: Run container with .env
+      shell: powershell
+      run: |
+        $repo = "${{ github.repository }}".ToLower()
+        $imageName = "ghcr.io/$repo/api:dev"
+        docker ps -a -q -f name=api_container | ForEach-Object { docker rm -f $_ }
+        Write-Host "Running container from image: $imageName"
+        docker run --env-file .env -d -p 9090:8080 --name api_container $imageName
