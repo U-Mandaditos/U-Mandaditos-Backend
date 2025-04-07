@@ -49,7 +49,7 @@ jobs:
 
         [System.IO.File]::WriteAllBytes(
           $firebasePath,
-          [System.Convert]::FromBase64String("${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}")
+          [System.Convert]::FromBase64String("${{ vars.FIREBASE_CREDENTIALS_BASE64 }}")
         )
 
         if (Test-Path $firebasePath) {
@@ -62,33 +62,17 @@ jobs:
           exit 1
         }
 
-    - name: Run container
-      shell: powershell
-      run: |
-        $repo = "${{ github.repository }}".ToLower()
-        $imageName = "ghcr.io/$repo/api:dev"
-
-        # Clean existing container
-        docker ps -a -q -f name=api_container | ForEach-Object { docker rm -f $_ }
-
-        $hostPath = Convert-Path "$env:GITHUB_WORKSPACE\Backend\Infrastructure"
-
-        Write-Host "Mounting volume from host path: $hostPath"
-        Write-Host "Directory contents before container run:"
-        Get-ChildItem -Path $hostPath
-
-        if (-Not (Test-Path "$hostPath\umandaditos_firebase.json")) {
-          Write-Host "Firebase file not found in host path. Aborting."
-          exit 1
-        }
-
-        docker run --env-file .env `
-          -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" `
-          -v "${hostPath}:/app/Infrastructure" `
-          -d -p 9090:8080 `
-          --name api_container `
-          $imageName
-
-        Write-Host "Verifying contents inside container:"
-        docker exec api_container ls -la /app/Infrastructure
-        docker exec api_container cat /app/Infrastructure/umandaditos_firebase.json | Select-String -First 3
+        - name: Run container
+          shell: powershell
+          run: |
+            ...
+            docker run --env-file .env `
+              -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" `
+              -v "${hostPath}:/app/Infrastructure" `
+              -d -p 9090:8080 `
+              --name api_container `
+              $imageName
+    
+            Write-Host "Verifying contents inside container:"
+            docker exec api_container ls -la /app/Infrastructure
+            docker exec api_container head -n 3 /app/Infrastructure/umandaditos_firebase.json
