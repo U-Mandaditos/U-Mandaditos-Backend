@@ -47,7 +47,7 @@ public class PostController : ControllerBase
     }
 
     
-    [HttpGet("{id}")]
+    [HttpGet("{idUser}")]
     public async Task<IActionResult> GetPostByUser([FromQuery] int idUser)
     {
         var posts = await _postService.GetPostsByPosterUserIdAsync(idUser);
