@@ -47,6 +47,12 @@ public class MandaditoController : ControllerBase
         return Ok(response);
     }
     
+    [HttpGet("runner")]
+    public async Task<ActionResult> GetMandaditosActiveByRunner()
+    {
+        var mandadito = await _mandaditoService.GetActivesByRunnerId();
+        return mandadito is null ? NotFound($"El mandadito no existe.") : Ok(mandadito);
+    }
     [HttpGet("history")]
     public async Task<ActionResult<IEnumerable<Dictionary<string, List<MandaditoDetailDto>>>>> GetHistoryMandaditos()
     {
@@ -121,4 +127,11 @@ public class MandaditoController : ControllerBase
         return Ok(result);
     }
 
+    /* Obtien el id del mandadito debido a un post */
+    [HttpGet("post/{idPost:int}")]
+    public async Task<ActionResult> GetMandaditoByPostId(int idPost)
+    {
+        var mandadito = await _mandaditoService.GetByPostIdAsync(idPost);
+        return mandadito is null ? NotFound($"El mandadito con id {idPost} no existe.") : Ok(mandadito);
+    }
 }

@@ -88,4 +88,18 @@ public class PostController : ControllerBase
             return StatusCode(500, $"Error interno del servidor: {e.Message}");
         }
     }
+
+    [HttpPatch("{id:int}/completed")]
+    public async Task<IActionResult> MarkAsCompleted(int id)
+    {
+        try
+        {
+            var post = await _postService.MarkAsCompletedAsync(id);
+            return Ok(post);
+        }
+        catch (Exception e)
+        {
+            return StatusCode(500, $"Error interno del servidor: {e.Message}");
+        }
+    }
 }

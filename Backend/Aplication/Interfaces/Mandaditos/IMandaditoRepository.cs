@@ -12,5 +12,7 @@ namespace Aplication.Interfaces.Mandaditos
         Task<int> DeliveriesCount(int idUser);
         Task<Dictionary<string, List<Mandadito>>> GetHistoryMandaditos(int userId);
         Task<Dictionary<string, List<Mandadito>>> GetHistoryMandaditosLikeRunner(int userId);
+        Task<IEnumerable<Mandadito>> GetActivesByRunnerId(int id);
+        Task<Mandadito?> GetByPostIdAsync(int idPost);
     }
 }

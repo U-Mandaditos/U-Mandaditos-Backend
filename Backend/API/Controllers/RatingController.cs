@@ -35,7 +35,7 @@ namespace API.Controllers
 
                 if (rating is null) return BadRequest("No se pudo crear el rating correctamente");
 
-                return CreatedAtAction(nameof(GetRatingById), new { id = rating.Id }, rating);
+                return CreatedAtAction(nameof(GetRatingById), new { id = rating.Data!.Id }, rating);
             }
             catch (Exception ex)
             {

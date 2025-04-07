@@ -163,4 +163,13 @@ public class PostRepository: IPostRepository
             })
             .ToListAsync();
     }
+
+    public async Task<bool> MarkAsCompleted(int idPost)
+    {
+        var post = await _context.Posts.FindAsync(idPost);
+        if (post is null) return false;
+        post.Completed = true;
+        _context.Posts.Update(post);
+        return await _context.SaveChangesAsync() > 0;
+    }
 }
