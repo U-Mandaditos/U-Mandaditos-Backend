@@ -40,15 +40,32 @@ jobs:
     - name: Setup Firebase Credentials
       shell: powershell
       run: |
-        # Decodificar y guardar el archivo
-        $firebasePath = "Backend/Infrastructure/umandaditos_firebase.json"
-        $decoded = [System.Convert]::FromBase64String("${{ vars.FIREBASE_CREDENTIALS_BASE64 }}")
-        [System.IO.File]::WriteAllBytes($firebasePath, $decoded)
+        # Crear directorio Infrastructure dentro de Backend
+        $backendPath = "$env:GITHUB_WORKSPACE/Backend"
+        $infraPath = "$backendPath/Infrastructure"
         
-        # Verificar que se creó correctamente
-        Write-Host "Firebase credential path: $(Resolve-Path $firebasePath)"
-        Write-Host "File exists: $(Test-Path $firebasePath)"
-        Write-Host "First 50 chars: $(Get-Content $firebasePath -Raw | Select-Object -First 50)"
+        New-Item -ItemType Directory -Path $infraPath -Force
+        
+        # Guardar el archivo en la ubicación correcta
+        $firebasePath = "$infraPath/umandaditos_firebase.json"
+        [System.IO.File]::WriteAllBytes(
+          $firebasePath,
+          [System.Convert]::FromBase64String("${{ secrets.FIREBASE_CREDENTIALS_BASE64 }}")
+        )
+    
+        # Verificaciones exhaustivas
+        Write-Host "Ubicación del archivo: $firebasePath"
+        Write-Host "Tamaño del archivo: $((Get-Item $firebasePath).Length) bytes"
+        Write-Host "Primeras líneas: $(Get-Content $firebasePath -Head 3)"
+
+    - name: Run container
+      run: |
+        docker run \
+          -v "$env:GITHUB_WORKSPACE/Backend/Infrastructure:/app/Infrastructure" \
+          -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" \
+          -d -p 9090:8080 \
+          --name api_container \
+          $imageName
 
     - name: Run container with .env
       shell: powershell
