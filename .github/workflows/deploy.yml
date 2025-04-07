@@ -62,17 +62,20 @@ jobs:
           exit 1
         }
 
-    - name: Run container
+    - name: Run container with .env
       shell: powershell
       run: |
-        ...
+        $repo = "${{ github.repository }}".ToLower()
+        $imageName = "ghcr.io/$repo/api:dev"
+        $hostPath = Join-Path $env:GITHUB_WORKSPACE "Backend\Infrastructure"
+        
+        # Detener y eliminar el contenedor si ya existe
+        docker ps -a -q -f name=api_container | ForEach-Object { docker rm -f $_ }
+        
+        Write-Host "Running container from image: $imageName"
         docker run --env-file .env `
           -e FIREBASE_CREDENTIAL_PATH="/app/Infrastructure/umandaditos_firebase.json" `
           -v "${hostPath}:/app/Infrastructure" `
           -d -p 9090:8080 `
           --name api_container `
           $imageName
-
-        Write-Host "Verifying contents inside container:"
-        docker exec api_container ls -la /app/Infrastructure
-        docker exec api_container head -n 3 /app/Infrastructure/umandaditos_firebase.json
