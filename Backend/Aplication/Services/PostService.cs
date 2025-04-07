@@ -1,7 +1,9 @@
 using Aplication.DTOs.General;
 using Aplication.DTOs.Posts;
 using Aplication.Interfaces.Auth;
+using Aplication.Interfaces.Helpers;
 using Aplication.Interfaces.Locations;
+using Aplication.Interfaces.Mandaditos;
 using Aplication.Interfaces.Posts;
 using Aplication.Interfaces.Users;
 using Domain.Entities;
@@ -14,13 +16,18 @@ public class PostService : IPostService
     private readonly IUserRepository _userRepository;
     private readonly ILocationRepository _locationRepository;
     private readonly IAuthenticatedUserService _authenticatedUserService;
+    private readonly INotificationService _notificationService;
+    private readonly IMandaditoRepository _mandaditoRepository;
 
-    public PostService(IPostRepository postRepository, IUserRepository userRepository, ILocationRepository locationRepository, IAuthenticatedUserService authenticatedUserService)
+    public PostService(IPostRepository postRepository, IUserRepository userRepository, ILocationRepository locationRepository,
+        IAuthenticatedUserService authenticatedUserService, INotificationService notificationService, IMandaditoRepository mandaditoRepository)
     {
         _postRepository = postRepository;
         _userRepository = userRepository;
         _locationRepository = locationRepository;
         _authenticatedUserService = authenticatedUserService;
+        _notificationService = notificationService;
+        _mandaditoRepository = mandaditoRepository;
     }
 
     public async Task<ResponseDTO<PostResponseDTO>> CreateAsync(PostRequestDTO dto)
@@ -195,6 +202,12 @@ public class PostService : IPostService
     public async Task<ResponseDTO<bool>> MarkAsAcceptedAsync(int idPost)
     {
         var success = await _postRepository.MarkAsAcceptedAsync(idPost);
+        
+        if (success)
+        {
+            var mandadito = await _mandaditoRepository.GetByPostIdAsync(idPost);
+            await _notificationService.SendAcceptedOfferNotification(idPost.ToString(), mandadito.Offer.Id.ToString());
+        }
 
         return new ResponseDTO<bool>
         {
