@@ -37,6 +37,19 @@ jobs:
         Set-Content -Path .env -Value $envContent
         Write-Host "Generated .env with content length: $($envContent.Length)"
 
+    - name: Setup Firebase Credentials
+      shell: powershell
+      run: |
+        # Decodificar y guardar el archivo
+        $firebasePath = "Infrastructure/umandaditos_firebase.json"
+        $decoded = [System.Convert]::FromBase64String("${{ vars.FIREBASE_CREDENTIALS_BASE64 }}")
+        [System.IO.File]::WriteAllBytes($firebasePath, $decoded)
+        
+        # Verificar que se creó correctamente
+        Write-Host "Firebase credential path: $(Resolve-Path $firebasePath)"
+        Write-Host "File exists: $(Test-Path $firebasePath)"
+        Write-Host "First 50 chars: $(Get-Content $firebasePath -Raw | Select-Object -First 50)"
+
     - name: Run container with .env
       shell: powershell
       run: |
