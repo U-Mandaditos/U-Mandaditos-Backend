@@ -40,7 +40,7 @@ docker run -d --name Nombre-Contenedor --env-file .env -p 8080:8080 Id-Imagen
 
 ### 📌 Notas importantes
 
-- Asegúrarse de ejecutar el contenedor desde un directorio que contenga un archivo .env configurado correctamente
+- Asegúrarse de ejecutar el contenedor desde un directorio que contenga un archivo .env configurado correctamente.
 - El puerto puede cambiarse modificando el parámetro -p (ej: -p 5000:8080)
 - Para ver los logs del contenedor: docker logs Nombre-Contenedor
 
